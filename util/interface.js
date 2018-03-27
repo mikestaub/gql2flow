@@ -97,12 +97,16 @@ ${fields}
     }
   };
 
-  const fieldToDefinition = (field) => {
+  const fieldToDefinition = (field, isInput) => {
     let interfaceName = resolveInterfaceName(field.type);
     let isNotNull = field.type.kind === 'NON_NULL';
 
-    const nullKeyCharacter = options.nullKeys || !isNotNull ? '?' : '';
-    const nullValueCharacter = options.nullValues || !isNotNull ? '?' : '';
+    const nullKeyCharacter = isNotNull && !options.nullKeys
+      ? ''
+      : '?';
+    const nullValueCharacter = (isInput || isNotNull) && !options.nullValues
+      ? ''
+      : '?'
 
     const fieldDef = `${field.name}${nullKeyCharacter}: ${nullValueCharacter}${interfaceName}`;
 
@@ -144,7 +148,7 @@ ${fields}
 
     let fields = f
       .filter(field => filterField(field, ignoredTypes))
-      .map(field => fieldToDefinition(field))
+      .map(field => fieldToDefinition(field, isInput))
       .filter(field => field)
       .join('\n');
 
